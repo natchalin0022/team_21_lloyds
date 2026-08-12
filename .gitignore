@@ -1,7 +1,6 @@
 .env
-.claude/
 .DS_Store
 *.csv
-
+API/CompaniesHouse/company_info_json/
 *.db
 *.pdf
