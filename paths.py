@@ -10,11 +10,11 @@ Usage in a notebook (any subfolder — API/, API/GDELT/, Model/, ...):
     from pathlib import Path
     ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "API").is_dir())
     sys.path.insert(0, str(ROOT))
-    from paths import SME_CSV, CHARGES_CSV, PANEL_CSV     # etc.
+    from paths import COMPANIES_CSV, CHARGES_CSV          # etc.
 
 Usage in a plain script:
 
-    from paths import SME_CSV, PANEL_CSV
+    from paths import COMPANIES_CSV
 
 All names below are pathlib.Path objects. Build sub-paths with `/`, e.g.
 `CH_DATA / "charges_history.csv"` — never with string `+`.
@@ -54,12 +54,25 @@ CH_DIR          = API_DIR / "CompaniesHouse"
 CH_DATA         = CH_DIR / "company_data"
 CHARGE_JSON_DIR = CH_DIR / "company_info_json"          # per-company charge/filing JSON
 
-ACCTYPE_CSV = CH_DATA / "company_with_acctype" / "com_names_with_acctype_test.csv"
-SME_CSV     = CH_DATA / "company_sme_with_acctype" / "com_names_sme_test.csv"
+# The single company table: one row per company ever pulled, `is_sme` flags the
+# modelling population. Non-SME rows are kept deliberately — they are the
+# "already checked, do not re-pull" cache that keeps Stage 1 resumable.
+COMPANIES_CSV = CH_DATA / "companies.csv"
+
+# Legacy two-file layout, archived 2026-08-14 — superseded by COMPANIES_CSV.
+# Nothing active reads these; the constants remain only so any old//notebook copy
+# still resolves instead of throwing. Both are reproducible from COMPANIES_CSV.
+ACCTYPE_CSV = CH_DATA / "Archive" / "company_with_acctype" / "com_names_with_acctype_test.csv"
+SME_CSV     = CH_DATA / "Archive" / "company_sme_with_acctype" / "com_names_sme_test.csv"
 CHARGES_CSV = CH_DATA / "charges_history.csv"           # label source (is_lloyds)
 FILINGS_CSV = CH_DATA / "filings_history.csv"           # Stage 6 output (may not exist yet)
 
-FINAL_DATA            = CH_DATA / "Final data"
+# Archived 2026-08-14: the original 13.5k-company snapshot. `11_7_26.csv` was the
+# input to two superseded model notebooks; the context-media copy is still read by
+# GDELT.ipynb as a postcode backfill source (down to ~24 usable rows, so it will
+# retire naturally once every company has a post_code).
+ARCHIVE               = CH_DIR / "Archive"
+FINAL_DATA            = ARCHIVE / "Final data"
 LEGACY_CSV            = FINAL_DATA / "11_7_26.csv"
 POSTCODE_BACKFILL_SRC = FINAL_DATA / "11_7_26_with_context_media.csv"
 
