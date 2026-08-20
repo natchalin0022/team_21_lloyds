@@ -1,9 +1,9 @@
 .env
 .DS_Store
 *.csv
-# ...but these two modelling tables are wanted in the repo
 !API/flat.csv
-!API/flat_conditional.csv
+!API/flat_pot.csv
+!API/CompaniesHouse/company_data/charges_history.csv
 API/CompaniesHouse/company_info_json/
 *.db
 *.pdf
