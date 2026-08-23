@@ -4,11 +4,16 @@ Import this instead of hardcoding absolute paths, so the project runs on ANY
 machine (yours, a teammate's, the client's) regardless of where it's checked out
 or which directory the notebook happens to be running from.
 
-Usage in a notebook (any subfolder — API/, API/GDELT/, Model/, ...):
+The four numbered pipeline notebooks live in the project root next to this file,
+so they can simply:
+
+    from paths import COMPANIES_CSV, CHARGES_CSV          # etc.
+
+From a notebook in a SUBfolder (API/, Model/, ...), bootstrap sys.path first:
 
     import sys
     from pathlib import Path
-    ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "API").is_dir())
+    ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "paths.py").exists())
     sys.path.insert(0, str(ROOT))
     from paths import COMPANIES_CSV, CHARGES_CSV          # etc.
 
@@ -26,23 +31,31 @@ from pathlib import Path
 def find_root(start=None):
     """Walk up from `start` (default: cwd) to the project root.
 
-    The root is the folder holding API/ and Model/ (also normally the git root),
-    so this resolves correctly whether the caller sits in API/, API/GDELT/,
-    Model/, or the root itself.
+    Only needed by callers that cannot import this module yet (they must find the
+    root to put it on sys.path). Once `paths` IS imported, use `ROOT` below, which
+    is derived from this file's own location and therefore cannot be wrong.
+
+    The root is the folder holding this file — equivalently the one holding API/
+    and Model/, and normally the git root.
     """
     start = Path(start).resolve() if start else Path.cwd().resolve()
     for cand in [start, *start.parents]:
+        if (cand / "paths.py").is_file():
+            return cand
         if (cand / "API").is_dir() and (cand / "Model").is_dir():
             return cand
         if (cand / ".git").exists() and (cand / "API").is_dir():
             return cand
     raise RuntimeError(
         f"Could not locate the project root from {start}. Expected an ancestor "
-        "directory containing both 'API/' and 'Model/'."
+        "directory containing 'paths.py' (or both 'API/' and 'Model/')."
     )
 
 
-ROOT = find_root()
+# The root is THIS FILE's folder. Deriving it from __file__ rather than from the
+# working directory is what lets every notebook run from anywhere — Jupyter, a
+# terminal, or an IDE with a different cwd — without a single relative path.
+ROOT = Path(__file__).resolve().parent
 
 # --- top-level folders -----------------------------------------------------
 API_DIR   = ROOT / "API"
@@ -82,9 +95,28 @@ GDELT_CACHE = GDELT_DIR / "BigQuery Cache files"
 MEDIA_INDEX = GDELT_CACHE / "context_media_index_104w.parquet"
 
 # --- modelling tables / outputs --------------------------------------------
-PANEL_CSV = API_DIR / "panel.csv"          # per (company, cutoff) panel
-FLAT_CSV  = API_DIR / "flat.csv"           # one row per company (look-alike)
+PANEL_CSV = API_DIR / "panel.csv"          # per (company, cutoff) panel (retired design)
+FLAT_CSV  = API_DIR / "flat.csv"           # one row per company (look-alike, retired)
+
+# THE live training table: one row per company, FORWARD-looking label.
+# Written by 3_Flat_table.ipynb, read by 4_model.ipynb. This path is the one
+# whitelisted in .gitignore, so keep the file here.
+FLAT_POT_CSV = API_DIR / "flat_pot.csv"
 LEADS_CSV = API_DIR / "leads_flat.csv"     # ranked RM lead list
+
+# --- client I/O (5_score.ipynb) --------------------------------------------
+# NOT under API/ — this is what the client sends in and what we hand back, not
+# data pulled from an external API. Everything here is gitignored: a customer
+# list is confidential commercial data and must never reach the repo or a
+# code submission. Ship the TEMPLATE, never a real list.
+CLIENT_DIR      = ROOT / "client"
+CLIENT_INPUT    = CLIENT_DIR / "input"
+CLIENT_OUTPUT   = CLIENT_DIR / "output"        # one dated subfolder per run
+CLIENT_TEMPLATE = CLIENT_INPUT / "client_companies_TEMPLATE.csv"
+
+# --- the shipped model artifact (written by 4_model.ipynb) -----------------
+MODEL_FILE     = MODEL_DIR / "model.joblib"
+MODEL_MANIFEST = MODEL_DIR / "model_manifest.json"
 
 
 if __name__ == "__main__":
