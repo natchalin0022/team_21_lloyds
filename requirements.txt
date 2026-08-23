@@ -1,0 +1,23 @@
+# Lloyds SME lead-scoring — Python dependencies
+# Derived from the imports actually used across notebooks 1-5 and paths.py.
+# Versions are those this build was developed and tested against.
+
+# --- core ---
+pandas>=3.0.1
+numpy>=2.4.2
+requests>=2.34.2
+python-dotenv>=1.1.0          # reads the Companies House API keys from .env
+tqdm>=4.67.1                  # progress bars on the long API pulls
+
+# --- modelling ---
+scikit-learn>=1.8.0           # LogisticRegression (primary), pipeline, grid search
+joblib>=1.5.3                 # persists the fitted pipeline to Model/model.joblib
+xgboost>=3.4.1                # comparator in 4_model.ipynb
+shap>=0.52.0                  # feature attribution in 4_model.ipynb
+matplotlib>=3.10.8
+
+# --- GDELT / BigQuery (needed only for 2_GDELT.ipynb Parts 3-4) ---
+# Part 5 (postcode -> region) uses postcodes.io and needs none of these.
+google-cloud-bigquery>=3.42.1
+db-dtypes>=1.7.0              # BigQuery -> pandas type mapping
+pyarrow>=23.0.1               # Parquet caches under API/GDELT/BigQuery Cache files/

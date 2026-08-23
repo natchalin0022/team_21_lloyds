@@ -1,0 +1,40 @@
+{
+  "model": "logreg",
+  "trained_at": "2026-08-23T16:43:42",
+  "trained_on_rows": 360600,
+  "trained_on_positives": 1203,
+  "prevalence": 0.003336,
+  "source_table": "/Users/natchalin_/Projects/final_project/Lloyds/API/flat_pot.csv",
+  "source_sha256": "9c1daa03ba2e745b",
+  "feature_cols": [
+    "sector",
+    "region",
+    "account_type",
+    "accounts_overdue",
+    "has_nonlloyds_charge",
+    "nonlloyds_charges",
+    "yrs_since_nonlloyds_chg",
+    "n_distinct_lenders",
+    "n_charges_last_24m",
+    "n_outstanding",
+    "n_satisfied",
+    "yrs_since_satisfaction",
+    "age_years"
+  ],
+  "cat_cols": [
+    "sector",
+    "region",
+    "account_type"
+  ],
+  "num_cols": [
+    "nonlloyds_charges",
+    "yrs_since_nonlloyds_chg",
+    "n_distinct_lenders",
+    "n_charges_last_24m",
+    "n_outstanding",
+    "n_satisfied",
+    "yrs_since_satisfaction",
+    "age_years"
+  ],
+  "sklearn_version": "1.8.0"
+}

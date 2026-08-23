@@ -7,3 +7,12 @@
 API/CompaniesHouse/company_info_json/
 *.db
 *.pdf
+
+# client data is confidential — never commit it.
+# git cannot un-ignore a file inside an excluded DIRECTORY, so exclude the
+# contents (client/*) rather than the folder, then re-admit the template last
+# (these rules must come after the blanket *.csv above to win).
+client/*
+!client/input/
+client/input/*
+!client/input/client_companies_TEMPLATE.csv
