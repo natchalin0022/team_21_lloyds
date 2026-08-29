@@ -1,9 +1,14 @@
 .env
 .DS_Store
 *.csv
+*.json
 !API/flat.csv
 !API/flat_pot.csv
 !API/CompaniesHouse/company_data/charges_history.csv
 API/CompaniesHouse/company_info_json/
+DataPreprocess/company_filing_pages/
+DataPreprocess/annotations/
+DataPreprocess/out/
+DataPreprocess/raw_ocr/
 *.db
 *.pdf
