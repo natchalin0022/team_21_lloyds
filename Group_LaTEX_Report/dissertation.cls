@@ -155,9 +155,10 @@
                               \vspace*{2.0cm}
   \parbox{16cm}{\begin{center}\LARGE \dissertation@title@major \end{center}} \\
                               \vspace*{0.5cm}
-  \mbox{\IfEq{\dissertation@title@minor}{}{}{\Large \dissertation@title@minor}} \\
+  \IfEq{\dissertation@title@minor}{}{}{%
+    \parbox{16cm}{\centering\Large \dissertation@title@minor \par}} \\
                               \vspace*{1.0cm}
-                          {\Large \dissertation@author}                         \\
+                          \parbox{16cm}{\centering\Large \dissertation@author \par} \\
 
                               \vspace*{1.0cm}
                           \rule{0.5\textwidth}{0.5pt}
