@@ -111,6 +111,33 @@ python paths.py
 relative or absolute path. It derives the project root from its own location, so the notebooks
 run from any working directory. Never hardcode a path; add a constant there instead.
 
+### The JSON cache
+
+`API/CompaniesHouse/company_info_json/` holds one raw JSON per company per endpoint
+(`<com_num>_charges.json`, `<com_num>_filings.json`). It is a **cache, not a deliverable**,
+and it may be absent from a copy of this repo that was trimmed for hand-off — it is by far
+the largest thing in the tree.
+
+Nothing downstream reads it. Notebooks 2–5 work entirely from the two derived tables,
+`companies.csv` and `charges_history.csv`, so **a client can score a list with the cache
+missing.** Only `1_CompaniesHouse.ipynb` touches the JSONs, and only to rebuild those tables.
+
+| | if the cache is deleted |
+|---|---|
+| **Stage 4** (charges) | **repairs itself** — it selects work by `Path.exists()` alone, so it re-fetches exactly the missing files (~105k companies, ~4.4 h on four keys) |
+| **Stage 6** (filings) | **disabled by default** (`RUN_STAGE_6 = False`) and does not repair itself — its `todo` also requires `n_filings.isna()`, so a company whose count is already recorded can never be re-fetched. Blank `n_filings` in `companies.csv` for those rows before re-enabling |
+
+Stages 4b and 6 rebuild `charges_history.csv` and `filings_history.csv` *from the cache* and
+make no API calls. Both **refuse to write** when the rebuild comes out more than 5% smaller than
+the file already on disk, rather than silently replacing the label source with an empty table.
+If you hit that error, restore the cache or run Stage 4 — do not delete the guard.
+
+**Stage 6 is switched off.** Filing history is not used anywhere: the shipped model's 13
+features come from the Stage 1 profile call and `charges_history.csv` alone, and neither
+notebook 3 nor notebook 5 opens `filings_history.csv`. The stage is kept, disabled, as the
+raw material for the point-in-time `account_type` fix under *Known limitations*. Set
+`RUN_STAGE_6 = True` in that cell to re-enable it.
+
 ---
 
 ## Client input
@@ -208,7 +235,7 @@ Stated plainly because they matter for interpreting results.
 
 3. **Three features are current snapshots**, not point-in-time: `account_type`,
    `accounts_overdue`, `sector`. Mild leakage. `filings_history.csv` (Stage 6) is the raw
-   material to fix it; the features are not built yet.
+   material to fix it; the features are not built, so Stage 6 ships disabled.
 
 4. **Yorkshire has no media cells** — the region never matched GDELT's location spellings.
    Those leads get a neutral re-rank rather than a wrong one.
@@ -240,9 +267,10 @@ paths.py                  every file location — import, never hardcode
 API/CompaniesHouse/company_data/
     companies.csv         one row per company ever pulled (is_sme flags the population)
     charges_history.csv   one row per charge — the label source
-    filings_history.csv   Stage 6 output; not yet consumed
+    filings_history.csv   Stage 6 output; unused — Stage 6 is disabled by default
     company_raw/          bulk company lists + ingested client lists
 API/CompaniesHouse/company_info_json/    per-company charge/filing JSON (~600k files)
+                          a rebuildable cache, safe to omit — see "The JSON cache"
 API/GDELT/BigQuery Cache files/          Parquet caches — never re-query if present
 API/flat_pot.csv          the training table
 Model/                    model.joblib + model_manifest.json
