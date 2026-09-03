@@ -1,6 +1,6 @@
 {
   "model": "logreg",
-  "trained_at": "2026-08-23T16:43:42",
+  "trained_at": "2026-09-03T19:57:25",
   "trained_on_rows": 360600,
   "trained_on_positives": 1203,
   "prevalence": 0.003336,

@@ -20,15 +20,16 @@
 %   (so 2014 rather than the academic year, say 2013/14 say).
 \PassOptionsToClass{openany}{book}
 \documentclass[ % the name of the author
-                    author={Natchalin Iwsakul \\ Inkaphol Siriwongwattana \\ Tanaphan Kummaraphat \\ Patorn Srisupap},
+                    author={Natchalin Iwsakul \\[0.4em] Inkaphol Siriwongwattana \\[0.4em] Tanaphan Kummaraphat \\[0.6em] Patorn Srisupap},,
                 % the name of the supervisor
                 supervisor={Fernando Moreno-Pino},
                 % the degree programme
                     degree={MSc},
                 % the dissertation    title (which cannot be blank)
-                     title={Propensity Modelling for SME Commercial Lending Using Open Public Data},
+                     title={Propensity Modelling for SME Commercial Lending Using Open Public Data
+},
                 % the dissertation subtitle (which can    be blank)
-                  subtitle={Companies House filings and GDELT media coverage as predictors of first-time borrowing},
+                  subtitle={Companies House and GDELT as predictors of first-time borrowing},
                 % the dissertation     type
                       type={},
                 % the year of submission
@@ -79,8 +80,6 @@
 \tableofcontents
 \listoffigures
 \listoftables
-\listofalgorithms
-\lstlistoflistings
 
 % The following sections are part of the front matter, but are not generated
 % automatically by LaTeX; the use of \chapter* means they are not numbered.
@@ -152,57 +151,24 @@ dissertation''); an example is as follows:
 \begin{quote}
 \noindent
 \begin{itemize}
-
-\item I used the {\em Pandas} and {\em Seaborn} public-domian Python Libraries. 
-
-\item I used a parts of the OpenCV computer vision library to capture 
-      images from a camera, and for various standard operations (e.g., 
-      threshold, edge detection).
-
-\item I used Amazon Web Services for remote storage and processing of data. Specifically, I used:
- \begin{itemize}
- \item Simple Storage Service (S3) for data storage
- \item Elastic Compute Cloud (EC2) for provision of virtual machines
- \item Elastic Beanstalk for scaling and load management
- \item Sagemaker for all the machine learning components of my project. 
- \end{itemize}
- 
+\item Data Sources:
+\begin{itemize}
+    \item Companies House: API, Bulk Resources
+    \item GDELT
+\end{itemize}
+\item Python Libraries:
+\begin{itemize}
+    \item unsloth - for loading in huggingface models
+    \item peft - for usage of LoRA adaptors
+    \item apted - access to the TEDS scoring metric
+    \item lxml, regex - financial feature extraction
+    \item Other Libraries: json, path, pandas, matplotlib.subplot, pymupdf, dotenv, and os
+    
+\end{itemize}
+\item Google Colab was used for their GPU resources, specifically their L4 NVIDIA Tensor GPU
 \item I used \LaTeX\ to format my thesis, via the online service {\em Overleaf}. 
 \end{itemize}
 \end{quote}
-
-% -----------------------------------------------------------------------------
-
-\chapter*{Notation and Acronyms}
-
-{\bf An optional section, of roughly $1$ or $2$ pages}
-\vspace{1cm} 
-
-\noindent
-Any well written document will introduce notation and acronyms before
-their use, {\em even if} they are standard in some way: this ensures 
-any reader can understand the resulting self-contained content.  
-
-Said introduction can exist within the dissertation itself, wherever 
-that is appropriate.  For an acronym, this is typically achieved at 
-the first point of use via ``Advanced Encryption Standard (AES)'' or 
-similar, noting the capitalisation of relevant letters.  However, it 
-can be useful to include an additional, dedicated list at the start 
-of the dissertation; the advantage of doing so is that you cannot 
-mistakenly use an acronym before defining it.  A limited example is 
-as follows:
-
-\begin{quote}
-\noindent
-\begin{tabular}{lcl}
-AES                 &:     & Advanced Encryption Standard                                         \\
-DES                 &:     & Data Encryption Standard                                             \\
-                    &\vdots&                                                                      \\
-${\mathcal H}( x )$ &:     & the Hamming weight of $x$                                            \\
-${\mathbb  F}_q$    &:     & a finite field with $q$ elements                                     \\
-$x_i$               &:     & the $i$-th bit of some binary sequence $x$, st. $x_i \in \{ 0, 1 \}$ \\
-\end{tabular}
-\end{quote}  
 
 % =============================================================================
 
@@ -462,11 +428,9 @@ While serving as the main source of information for company profiles, it cannot 
         Classification status & 4 & CompanyStatus \\
         Lifecycle dates & 2 & IncorporationDate \\
         Accounts metadata & 5 & Accounts.AccountCategory \\
-        Confirmation statement / returns & 4 & ConfStmtNextDueDate \\
         Charges & 4 & Mortgages.NumMortOutstanding \\
         SIC codes & 4 & SICCode.SicText\_1 \\
         Previous names & 20 & PreviousName\_1.CompanyName \\
-        Limited partnerships & 2 & - \\
         \bottomrule
     \end{tabular}
     \caption{Example result schema for bulk company profile downloads}
@@ -487,8 +451,8 @@ The relevance of news and economic signal is supported through literatures. For 
 
 \subsubsection{NewsAPI: NewsAPI.org and The Guardian}
 \label{sec:newsapi}
-% NEED CITATION
-As part of media data, two APIs, NewsAPI.org \cite{newsapi.org} and The Guardian \cite{theguardian}, were explored. Both provide headlines, content, and details such as date and source, which can be searched using keywords and filters. News data then goes through the sentiment analysis process, using vaderSentiment \cite{hutto_cjhuttovadersentiment_2026}. Table \ref{newsapisentiment} shows an example of sentiment analysis of news data.
+
+As part of media data, two NewsAPIs, NewsAPI.org \cite{newsapi.org} and The Guardian \cite{theguardian}, were explored. Both provide headlines, content, and details such as date and source, which can be searched using keywords and filters. News data then goes through the sentiment analysis process, using vaderSentiment \cite{hutto_cjhuttovadersentiment_2026}. Table \ref{newsapisentiment} shows an example of sentiment analysis of news data.
 
 \begin{table}[h]
     \centering
@@ -497,16 +461,17 @@ As part of media data, two APIs, NewsAPI.org \cite{newsapi.org} and The Guardian
     company\_name & article\_count & avg\_compound\_score & pct\_positive & pct\_negative & pct\_neutral\\
     \midrule
     Lidl & 92 & 0.344 & 0.511 & 0.065 & 0.424 \\
+    ... & ... & ... & ...& ... & ... \\
     \bottomrule
     \end{tabular}
     \caption{NewsAPI Sentiment Analysis}
     \label{newsapisentiment}
 \end{table}
 
-% CITE:  https://vadersentiment.readthedocs.io/en/latest/index.html
+% CITE:  https://vadersentiment.readthedocs.io/en/latest/index.html --> Cite GitHub instead
 VADER (Valence Aware Dictionary and sEntiment Reasoner) \cite{hutto_cjhuttovadersentiment_2026} is an open-source sentiment analysis tool, and it was chosen due to its focus on social media sentiment. As shown in Table \ref{newsapisentiment}, avg\_compound\_score is the main score deciding the tone, with -1 being most negative and +1 being most positive. The thresholds suggested in the documentation \cite{} are that $score \geq 0.5$ is positive sentiment, $score \leq -0.5$ is negative sentiment, and $-0.5 < score < 0.5$ is neutral sentiment. The columns pct\_positive, pct\_negative, and pct\_neutral are the ratios that sum to 1. They are included in the table for completeness in case they could be used during the model training stage.
 
-The APIs themselves are straightforward, but they need to be handled properly from the searching strategy to storing the data. Their limitations are concerning. Starting from NewsAPI.org, the content provided is always truncated to 200 characters, losing a lot of details from the news. NewsAPI.org \cite{newsapi.org} on the free tier also only allows access to the first page, news up to one month old, and a maximum of 100 requests per day. This results in difficulty gathering news data. To avoid this limitation, an alternative API, The Guardian \cite{theguardian}, provides more freedom and details, focusing on the UK since the source is The Guardian itself. However, the most concerning limitation is gathering news for specific companies, and since our focus is SMEs, it is almost impossible to do so. This inevitable limitation makes it impractical to include news data in the training data. The searching strategy could be changed to use broader keywords, like sector levels, rather than individual companies, though it is not very beneficial given our use of GDELT. Therefore, the team agreed to abandon NewsAPI.org and The Guardian, and instead focus on GDELT.
+The APIs themselves are straightforward, but they need to be handled properly, from the searching to storing the data. Their limitations are concerning. Starting from NewsAPI.org, the content provided is always truncated to 200 characters, losing a lot of details from the news. NewsAPI.org \cite{newsapi.org} on the free tier also only allows news up to one month old and a maximum of 100 requests per day. This results in difficulty gathering news data. To avoid this limitation, an alternative API, The Guardian \cite{theguardian}, provides more freedom and details, focusing on the UK since the source is The Guardian itself. However, the most concerning limitation is gathering news for specific companies, and since our focus is SMEs, it is almost impossible to do so. This inevitable limitation makes it impractical to include news data in the training data. The searching strategy could be changed to use broader keywords, like sector levels, rather than individual companies, though it is not very beneficial given our use of GDELT. Therefore, the team agreed to abandon NewsAPI.org and The Guardian, and instead focus on GDELT.
 
 
 \subsection{Techniques}
@@ -530,17 +495,14 @@ Additionally, Quantized Low-Rank Adaptation (QLoRA) \cite{dettmers2023} can furt
 
 \subsection{Machine Learning Models}
 \label{sec:mlmodels}
-Three machine learning models used in this project consist of logistic regression, XGBoost, and Neural Network (Multi-layer Perceptron or MLP). This set of models are selected from their difference in explainability and expected performance. 
+Three machine learning models used in this project consist of logistic regression, XGBoost, and Neural Network (Multi-layer Perceptron or MLP). This set of models was selected due to their differences in explainability and expected performance. 
 
 \subsubsection{Logistic Regression}
 \label{sec:logisticregression}
-% NOT DONE
 
-% Logistic Regression is chosen instead of linear regression because the outcome variable in this project is binary. 
+Hosmer and Lemeshow \cite{hosmer_applied_2013} explain that the aim of regression models is to identify a simple and interpretable model that best fits the data, describing the relationship between a dependent outcome and independent variables, often referred to as covariates. The concept of logistic regression is similar to linear regression, but it differs from linear regression because the outcome is binary rather than continuous, shaping the model's structure and assumptions.
 
-Hosmer and Lemeshow \cite{hosmer_applied_2013} explain that the aiming of regression models is to identify the simple and interpretable model that best fits the data, describing the relationship between a dependent outcome and independent variables, often referred to as covariates.The concept of logistic regression is similar to linear regression, but it differs from linear regression because the outcome is binary rather than continuous, shaping the model's structure and assumptions.
-
-As explained by James et al. in \cite{james_introduction_2013}, while linear regression can handle continuous numerical tasks, it would fail in classification tasks where linear line is no longer capable. This is where logistic regression performs well. It uses the logistic function \(p(x) = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 +\beta_1 X}}\), which gives the outputs between 0 or 1, regardless of the input values. This function produces an S-shaped curve, laying close to 0 and 1, but never goes beyond that. James et al \cite{james_introduction_2013} describes odds as \( \frac{p(X)}{1-p(X)}\), varying from 0 to infinity. Higher values indicate higher probability. By applying logarithm to the equation: \( log(\frac{p(X)}{1-p(X)}) = \beta_0 + \beta_1X\), the left side of the equation is logit, where \(\beta_0\) and \(\beta_1\) are unknown coefficients. They are generally estimated using maximum likelihood. Once both coefficients \(\beta_0\) and \(\beta_1\) are calculated, the model can then predict the probability.
+As explained by James et al. in \cite{james_introduction_2013}, while linear regression can handle continuous numerical tasks, it would fail in classification tasks where a linear line is no longer capable. This is where logistic regression performs well. It uses the logistic function \(p(X) = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 +\beta_1 X}}\), which gives outputs between 0 and 1, regardless of the input values. This function produces an S-shaped curve, lying close to 0 and 1, but never going beyond that. James et al. \cite{james_introduction_2013} describe odds as \( \frac{p(X)}{1-p(X)}\), varying from 0 to infinity. Higher values indicate a higher probability. By applying a logarithm to the equation: \( log(\frac{p(X)}{1-p(X)}) = \beta_0 + \beta_1X\), the left side of the equation is the logit or log-odds, where \(\beta_0\) and \(\beta_1\) are unknown coefficients. They are generally estimated using maximum likelihood. Once both coefficients \(\beta_0\) and \(\beta_1\) are calculated, the model can then predict the probability.
 
 % Sperandei \cite{sperandei_understanding_2014} describes that ....
 
@@ -548,32 +510,76 @@ As explained by James et al. in \cite{james_introduction_2013}, while linear reg
 
 
 
-\subsubsection{XGBoost and SHAP}
+%==========================================================
+\subsection{XGBoost and SHAP}
+%==========================================================
 
-\textbf{not sure if definition need citation or not for the model?}
+A decision tree is a machine learning algorithm that
+produces predictions by applying a sequence of binary
+questions to the input data. For example, it might ask
+whether a company age is more than ten years old, then
+whether it has any outstanding charges, splitting the
+data at each step until it reaches a final prediction.
+Decision trees are straightforward to understand 
+any prediction can be traced back through the sequence
+of binary questions that produced it. However, when
+grown too deep, a single tree tends to memorise the
+specific patterns in its training data rather than
+learning rules that apply more broadly to new data.
+This is known as overfitting, which means the model
+will perform poorly when presented with new unseen
+companies. Gradient Boosting addresses this limitation
+by increasing the robustness of the model. Trees are
+trained one at a time, and each new tree is built
+specifically to correct the mistakes made by the trees
+that came before it. This sequential error-correction
+process is the defining feature of gradient boosting,
+which forms the foundation of XGBoost.
 
-A decision tree is a machine learning model algorithm that produces predictions by applying a sequence of binary questions on the input data. For example, whether a company age is more than ten years old, then whether it has any outstanding charges splitting the data at each step until it reaches a final prediction. Decision trees are straightforward to understand, any prediction can be traced back through the sequence of binary questions that produced it. However, when grown too deep a single tree tends to memories the specific patterns in its training data rather than learning rules that apply more broadly to the new dataset. This is recall as overfitting which means the model will perform poorly while presented with the new unseen company.
-Gradient Bossing comes in hand to increase the robustness of the model. Trees are trained one at a time, and each new tree is built specifically to correct the mistakes made by the trees that came before it. This sequential error-correction process is the defining feature of gradient boosting, which forms the foundation of XGBoost.
+XGBoost was introduced by Chen \cite{chen_xgboost_2016} as an
+improved and more efficient version of the gradient
+boosting method. It is a scalable machine learning
+algorithm that builds a series of decision trees, with
+each new tree helping to correct the errors made by
+the previous ones.
 
-% Need a proper citation
-XGBoost was introduced by Chen and Guestrin (2016) as an improved and more efficient version of the gradient boosting method. It is a scalable machine learning algorithm that builds a series of decision trees, with each new tree helping to correct the errors made by the previous ones. 
+Tree ensemble models such as XGBoost are recommended
+for classification problems involving structured tabular
+data Guliyev \citep{guliyev_customer_2021} and have practically
+demonstrated strong performance on banking-specific
+classification tasks.
 
-Tree ensemble models such as XGBoost are knownly recommended for classification problems involving structured tabular data (Shwartz-Ziv and Armon, 2022) and have practically demonstrated strong performance on banking-specific classification tasks.
+To improve the interpretability of the model, this
+project uses SHAP (SHapley Additive exPlanations).
+SHAP is a method used to explain how individual
+features influence a model's prediction. The core
+foundation of the method is Shapley values from
+cooperative game theory, which provide an efficient
+way of distributing the contribution of different
+factors to an overall outcome. In machine learning,
+each feature is treated as a contributing factor to
+the model's prediction. A SHAP value shows how much
+each feature increases or decreases the predicted
+outcome.
 
-To improve the interpretability of the model, this project uses SHAP(SHapley Additive exPlanations). SHAP is a method used to explain how individual features influence a model's prediction. The core foundation of the method is Shapley values from cooperative game theory, which provide an efficient way of distributing the contribution of different factors to an overall outcome. 
-In machine learning, each feature is treated as a contributing factors to the model's prediction. A SHAP value shows how much each features increase or decreases the predicted outcome.
-
-The importance of model interpretability in financial services has been recognised at the coperate level, Bracke et al. (2019), in a Bank of England working paper, demonstrate how machine-learning explainability methods can be applied to financial risk analysis. The authors claim that the interpretability of the model is essential for effective supervision and accountabilty in banking, especially when models are used to support important financial decisions.
-\label{sec:xgboost}
+The importance of model interpretability in financial
+services has been recognised at the corporate level.
+Bracke \cite{bracke_machine_2019}, in a Bank of England working paper,
+demonstrate how machine learning explainability methods
+can be applied to financial risk analysis. The authors
+argue that the interpretability of the model is
+essential for effective supervision and accountability
+in banking, especially when models are used to support
+important financial decisions.
 
 \subsubsection{Multi-layer Perceptron}
 \label{sec:neuralnetwork}
 
-Murtagh \cite{murtagh_multilayer_1991} explains that the perceptron algorithm was implemented in 1950s. It started as a single perceptron before being developed to multilayer perceptron. The perceptron learns by first creating arbitrary weight values. The equation \(o = \Sigma_j w_j x_j\) is then calculated and compared to a threshold, \(\theta\). The variables \(o\), \(w\), and \(x\), are the output, weights, and input values, respectively. The weights and the thresholds are adjusted according to the difference between the ground truth and the prediction. \(\Delta\theta = -(t_p - o_p) = -\delta_p\) is the threshold change, and \(\Delta w_i = (t_p - o_p)x_{pi} = \delta_px_{pi}\) is the weight change.
+Murtagh \cite{murtagh_multilayer_1991} explains that the perceptron algorithm was implemented in the 1950s. It started as a single perceptron before being developed into a multilayer perceptron. The perceptron learns by first creating arbitrary weight values. The equation \(o = \Sigma_j w_j x_j\) is then calculated and compared to a threshold, \(\theta\). The variables \(o\), \(w\), and \(x\) are the output, weights, and input values, respectively. The weights and the thresholds are adjusted according to the difference between the ground truth and the prediction. \(\Delta\theta = -(t_p - o_p) = -\delta_p\) is the threshold change, and \(\Delta w_i = (t_p - o_p)x_{pi} = \delta_px_{pi}\) is the weight change.
 
 Murtagh \cite{murtagh_multilayer_1991} gives a counter-example: an exclusive-or (XOR) problem, showing that a simple perceptron fails in this situation, and that a multilayer perceptron is required for this nonlinear classification problem. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.35\linewidth]{Group_LaTEX_Report/figures/multilayer network.png}
     \caption{Multilayer Network}
@@ -581,9 +587,9 @@ Murtagh \cite{murtagh_multilayer_1991} gives a counter-example: an exclusive-or 
 \end{figure}
 
 Figure \ref{fig:mlp} illustrates a multilayer network.
-Every node in one layer is connected every node in the next layer, from the input layer to the hidden layer, and from the hidden layer to the output layer. Each node follows the same concept as the simple perceptron explained above, but a nonlinear transfer function is applied, allowing the model to handle more complex data.
+Every node in one layer is connected to every node in the next layer, from the input layer to the hidden layer, and from the hidden layer to the output layer. Each node follows the same concept as the simple perceptron explained above, but a nonlinear transfer function is applied, allowing the model to handle more complex data.
 
-The multilayer networks can effectively handle the classification tasks. As discussed in \cite{murtagh_multilayer_1991} a 3-layer architecture is often considered sufficient. However, it is recommended that every problem requires a customized configuration, and there is no one-size-fits-all configuration. Murtagh \cite{murtagh_multilayer_1991} also suggests that a higher number of nodes provides more sensitivity, though it might cause overfitting. 
+The multilayer network can effectively handle classification tasks. As discussed in \cite{murtagh_multilayer_1991}, a 3-layer architecture is often considered sufficient. However, every problem requires a different configuration, and there is no one-size-fits-all configuration. Murtagh \cite{murtagh_multilayer_1991} also suggests that a higher number of nodes provides more sensitivity, though it might cause overfitting. 
 
 
 \subsubsection{Evaluation Metrics}
@@ -868,45 +874,22 @@ After weighing between the trades off, five years sit at a good balance as the c
   While all numerical cells in iXBRL files are tagged using a standardized format, enabling traversal the document without the need to hold onto the indexing for rows and columns, dates have to be handled separately; this is because all cells containing numbers are provided only the reference keyword \textbf{\textit{(contextRef)}} in place of the actual period \textbf{\textit{(context)}}. Therefore, a mapping of the time period and their reference must be done before traversing the main tables. Each value within the table is then mapped to their field name and added to a dictionary where the key is the de-referenced time period. Negative values are checked through the \textbf{\textit{sign}} field, which is only present when the cell is negative. 
 
 \subsection{Sample Set Creation}
-  As a sample set is needed to fine-tune the baseline Qwen-VL-8B model, 60 companies were selected from the filtered set defined previously in Section \ref{chap:defining_sme_pop}. Their newest account posted to Companies House are then collected and separated into individual pages and grouped by their companies. These are then passed to an unrelated Qwen model for an initial OCR step to assist with later hand labelling steps; this is mainly done to obtain the general JSON structure for each page and not its contents, which can be modified in annotation. Figure \ref{fig:annotation_folders} shows the file structure within for the annotation process, with \textbf{\textit{raw\_ocr}} and \textbf{\textit{company\_filing\_pages}} representing the unmodified OCR results stored as JSON files and the source filing pages. Lastly, the \textbf{\textit{annotations}} folder contains the cleaned and annotated samples for the selected companies.
-
-  After correcting malformed JSON and value errors, a folder is created for the company using their company number which stores the annotation status of the page, any notes, and the JSON payload; this structure, as displayed Listing \ref{list:annotation-json-example}, ensures that tables can be traced back up to the page and company of origin, and allows for indexing of the raw image file associated with the JSON payload.
-
-  \begin{figure}[H]
+    \begin{figure}[H]
       \centering
       \includegraphics[width=0.65\linewidth]{Group_LaTEX_Report/figures/annotation_file_structure.png}
       \caption{File structure used for the annotation process}
       \label{fig:annotation_folders}
   \end{figure}
+  As a sample set is needed to fine-tune the baseline Qwen-VL-8B model, 60 companies were selected from the filtered set defined previously in Section \ref{chap:defining_sme_pop}. Their newest account posted to Companies House are then collected and separated into individual pages and grouped by their companies. These are then passed to an unrelated Qwen model for an initial OCR step to assist with later hand labelling steps; this is mainly done to obtain the general JSON structure for each page and not its contents, which can be modified in annotation. Figure \ref{fig:annotation_folders} shows the file structure within for the annotation process, with \textbf{\textit{raw\_ocr}} and \textbf{\textit{company\_filing\_pages}} representing the unmodified OCR results stored as JSON files and the source filing pages. Lastly, the \textbf{\textit{annotations}} folder contains the cleaned and annotated samples for the selected companies.
 
-  \begin{listing}[H]
-\begin{minted}[frame=single,
-               framesep=2mm,
-               linenos=true,
-               xleftmargin=21pt,
-               tabsize=4]{js}
-annotations/0XXXXXXX
-{     
-    "page_00X.png": {
-        "status": 'pending' | 'verified' | 'corrected' |'skipped',
-        "note": "",
-        "payload": {
-            "table_found": true | false,
-            "tables" : [
-                "table_name": "Example Table",
-                "headers": ["Item", "Period 1", "Period 2"],
-                "rows": [
-                    ["A", "2025", "2024"],
-                    ["B", "2025", "2024"]
-                ],
-            ]
-        }
-    } 
-}
-\end{minted}
-\caption{Example JSON structure for annotated files} 
-\label{list:annotation-json-example}
-\end{listing}
+  After correcting malformed JSON and value errors, a folder is created for the company using their company number which stores the annotation status of the page, any notes, and the JSON payload; this structure, as displayed Listing \ref{fig:placeholder}, ensures that tables can be traced back up to the page and company of origin, and allows for indexing of the raw image file associated with the JSON payload.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70.\linewidth]{Group_LaTEX_Report/figures/annotation_example.png}
+    \caption{Example JSON Structure for Annotated Files}
+    \label{fig:placeholder}
+\end{figure}
 
 \subsection{Model Fine-Tuning}
   Initial versions of the model only implemented prompt engineering, which contained rudimentary rule-set and instructions on the desired JSON output format. However, even after several modifications were made to the instruction set, several issues persisted; this being the merging of several tables with unequal table dimensions, frequent mis-classification of rows containing dates as header columns, and interchanged use of \textbf{\textit{null}} and \textbf{\textit{"-"}} in the same table. Additional rules created to clarify these errors further degraded the response which indicated that prompting alone was no longer effective, necessitating the fine-tuning process. The previously annotated companies are used as the corpus, with the default split of 80\% training and 20\% testing used, resulting in a set of 212 and 52 examples for training and testing respectively. Furthermore, the split is made by company and not by page; this is done to prevent the model from indirectly peeking into the evaluation set through factors like document formatting or general tabular structure. 
@@ -921,7 +904,7 @@ annotations/0XXXXXXX
     Quantization    &   4-bits (4nf)    \\
     Rank & 8    \\
     Target Modules & attention, MLP projections, and language layers \\
-    Trainable parameters    &   43,646,976 of 8,810,770,672 (0.50\%) \\
+    Trainable parameters    &   21,823,488 of 8,788,947,184 (0.25\%) \\
     Optimiser	& adamw\_8bit  \\
     Number of Epochs / Steps    & 3/45 \\
     Learning rate	& $2 \times 10^{-4}$ \\
@@ -1004,7 +987,8 @@ annotations/0XXXXXXX
 \subsection{PDF-based Image Feature Selection}
 Unlike iXBRL cells which are tagged, the JSON structure resulting from the OCR process does not intrinsically contain any dates or taxonomical identifiers, meaning they must be pulled from the tables directly. As such, the process iterates through every table, standardizes the field name to Companies House taxonomy, and retrieves the date through its column index. The resulting file is then deposited in the same folder as extracted features from iXBRL.
 
-\section{Modelling}                            \label{sec:model}
+\section{Modelling}                            
+\label{sec:model}
 
   \subsection{Model choice}
 
@@ -1014,10 +998,10 @@ Unlike iXBRL cells which are tagged, the JSON structure resulting from the OCR p
 % XGBoost: it is expected to achieve the best performance among these three models.
 % MLP: We believe this model may be too complex for the task, though it is chosen for comparison purpose.
   
-  Logistic Regression, XGBoost, and Neural Network (MLP) have different explainability and capability. They are widely used across various fields. While linear models like logistic regression provide transparency, they might not handle complex tasks as well as the other two. However, given the required task and data used in this project, as well as explainability focused, we expect logistic regression to be adequate, achieving acceptable performance. XGBoost is a well-known tree-based model, providing high classification performance with some interpretability trade-off compared to logistic regression. MLP or Multi-layer Perceptron, on the other hand, is the most complicated of the three models and can perform well in complex tasks, although it is often called black-box model.
+  Logistic Regression, XGBoost, and Neural Network (MLP) have different explainability and capability. While simple models like logistic regression provide transparency, they might not handle complex tasks as well as the other two. However, given the required task and data used in this project, as well as the focus on explainability, we expect logistic regression to achieve adequate and acceptable performance. XGBoost is a well-known tree-based model, providing high classification performance with some interpretability trade-off compared to logistic regression. We expect XGBoost to achieve the best performance. MLP, or Multi-layer Perceptron, on the other hand, is the most complicated of the three models and can perform well in complex tasks, although it is often called a black-box model.
 
   \subsection{EDA and Cleaning}
-  The data first goes through the EDA (Exploratory Data Analysis) process. There are 360,600 companies and 17 columns with no missing values. It is clear that the data has an extreme class imbalance at 0.33\%. This is real-world data, and it is understandable to have a small proportion of companies being Lloyds customers given the total number of companies. This extreme class imbalance inevitably affects model's performance. However, forcing the dataset to have a balanced class would manipulate the model in an undesired way and fail to reflect the real-world situation. Therefore, the team proceeded to train the models with this actual data, acknowledging its impact. Since the data does not contain any missing values, only one unused column, readmitted, is removed. Among the remaining 16 columns, 2 columns, \textit{com\_num} and \textit{name}, are identifiers, and the rest are the features used for training.
+  The data first goes through the EDA (Exploratory Data Analysis) process. There are 360,600 companies and 17 columns with no missing values. It is clear that the data has an extreme class imbalance at 0.33\%. This is real-world data, and it is understandable to have a small proportion of companies being Lloyds customers given the total number of companies. This extreme class imbalance inevitably affects the models' performance. However, forcing the dataset to have a balanced class would manipulate the model in an undesired way and fail to reflect the true population. Therefore, the team proceeded to train the models with this actual data, acknowledging its impact. Since the data does not contain any missing values, only one unused column, readmitted, is removed. Among the remaining 16 columns, 2 columns, \textit{com\_num} and \textit{name}, are identifiers, and the remaining columns are the features used for training the models.
 
   \subsection{Preprocessing}
   
@@ -1049,14 +1033,14 @@ Unlike iXBRL cells which are tagged, the JSON structure resulting from the OCR p
       \label{columnsmanagement}
   \end{table}
   
-  All columns are assigned to different types, as shown in Table \ref{columnsmanagement}. The data is then split into 80\% training set and 20\% testing set using \textit{train\_test\_split()} from \textit{scikit-learn} \cite{Pedregosa_Scikit-learn_Machine_Learning_2011}. The parameter is set as \textit{stratify=y} to ensure both sets have the same proportion of labels. Categorical columns should be processed with one-hot encoder, and numerical columns should be scaled to prevent different ranges between features. 
+  All columns are assigned to different types, as shown in Table \ref{columnsmanagement}. The data is then split into 80\% training set and 20\% testing set using \textit{train\_test\_split()} from \textit{scikit-learn} \cite{Pedregosa_Scikit-learn_Machine_Learning_2011}. The parameter is set as \textit{stratify=y} to ensure both sets have the same proportion of labels. Categorical columns are processed with one-hot encoding, and numerical columns are scaled to ensure the features are in the same range.
     
   \subsection{Model Training}
-  Each model setup is added to the pipeline along with the preprocessing step mentioned earlier, resulting in 3 different pipelines: \textit{pipe\_lr}, \textit{pipe\_xgb}, and \textit{pipe\_nn}. Each model goes through 5 folds cross-validation and grid search with various hyperparameter settings.
+  Each model setup is added to the pipeline along with the preprocessing step mentioned earlier, resulting in 3 different pipelines: \textit{pipe\_lr}, \textit{pipe\_xgb}, and \textit{pipe\_nn}. Each model goes through 5-fold cross-validation and grid search with various hyperparameter settings.
 
-  Cross-validation is used here to evaluate the models before testing them with the real test set. It works by setting the k value, which defines the number of folds. Then, the model is trained on k-1 folds and validated on the rest. This process repeats k times so that every fold is used for validation. This approach helps prevent the leakage and bias toward the test set. If the model were tuned based on how well it performs on the test set, the data in that set would manipulate the model, and the evaluation would fail to reflect the actual model's performance. On the other hand, cross-validation happens only in the training set, leaving the test set untouched. Therefore, the testing data is truly unseen, and the evaluation metrics reflect the actual performance.
+  Cross-validation is used here to evaluate the models before testing them with the real test set. It works by setting the k value, which defines the number of folds. Then, the model is trained on k-1 folds and validated on the rest. This process repeats k times so that every fold is used for validation. This approach helps prevent leakage and bias toward the test set. If the model were tuned based on how well it performs on the test set, the data in that set would manipulate the model, and the evaluation would fail to reflect the model's actual performance. On the other hand, cross-validation happens only on the training set, leaving the test set untouched. Therefore, the testing data is truly unseen, and the evaluation metrics reflect the actual performance.
 
-  Grid search is the process of trying every hyperparameter value combination. Each combination is evaluated with cross-validation, and the one achieving the highest score on the selected evaluation metric, which in this case is average precision, will be chosen. Since the number of folds is set to 5, every combination will be run 5 times. This process consumes time, and it gets longer easily as the number of combinations is increased. 
+  Grid search is the process of trying every hyperparameter value combination. Each combination is evaluated with cross-validation, and the one achieving the highest score on the selected evaluation metric, which in this case is average precision, is chosen. Since the number of folds is set to 5, every combination will be run 5 times. This process is time-consuming, and it gets longer as the number of combinations is increased. However, a balanced configuration of hyperparameters is crucial to train a proper model.
 
  
   For logistic regression, the only hyperparameter tested is C, which is the inverse of regularization strength according to scikit-learn \cite{Pedregosa_Scikit-learn_Machine_Learning_2011}, meaning a smaller C value results in stronger regularization. It is tested for 4 different values: 0.01, 0.1, 1 (default), and 10. As a result, the best configuration is \textit{C} = 0.1, achieving an average precision of 0.010115. The comparison of performance between each configuration is shown in Table \ref{gridsearchlogistic}. 
@@ -1076,8 +1060,8 @@ Unlike iXBRL cells which are tagged, the JSON structure resulting from the OCR p
       \caption{Grid Search | Logistic Regression}
       \label{gridsearchlogistic}
   \end{table}
-
-  For XGBoost, three different hyperparameters are tested: \textit{learning\_rate}, \textit{max\_depth}, and \textit{n\_estimators}. According to the XGBoost documentation \cite{noauthor_dmlcxgboost_2026}, the number of estimators is the number of gradient boosted trees to be created. Learning rate, or eta, controls how fast the model learns. A high learning rate means the model fits quickly but might cause overfitting, while a low learning rate requires more steps, or a higher number of estimators, to learn properly, meaning it takes longer to overfit, but the model might also underfit if the number of estimators is too low. Maximum depth is the maximum tree depth, controlling the complexity of each tree. And since the data has an imbalanced class, the value of scale\_pos\_weight is sum(negative instances) / sum(positive instances), as suggested in XGBoost documentation \cite{noauthor_dmlcxgboost_2026}. Table \ref{gridsearchxgboost} shows the top 5 configurations achieving the highest average precision score. The best configuration is \textit{learning\_rate} at 0.01, \textit{max\_depth} at 6, \textit{n\_estimators} at 200, achieving an average precision of 0.0.011957.
+  
+  For XGBoost, three different hyperparameters are tested: \textit{learning\_rate}, \textit{max\_depth}, and \textit{n\_estimators}. According to the XGBoost documentation \cite{noauthor_xgboost_nodate}, the number of estimators is the number of gradient-boosted trees to be created. Learning rate, or eta, controls how fast the model learns. A high learning rate means the model fits quickly but might cause overfitting, while a low learning rate requires more steps, or a higher number of estimators, to learn properly, meaning it takes longer to overfit, but the model might also underfit if the number of estimators is too low. Maximum depth is the maximum tree depth, controlling the complexity of each tree. Since the data has a class imbalance, the value of \textit{scale\_pos\_weight} is sum(negative instances) / sum(positive instances), as suggested in the XGBoost documentation \cite{noauthor_xgboost_nodate}. Table \ref{gridsearchxgboost} shows the top 5 configurations achieving the highest average precision score. The best configuration is \textit{learning\_rate} at 0.01, \textit{max\_depth} at 6, and \textit{n\_estimators} at 200, achieving an average precision of 0.011957.
 
   \begin{table}[h]
       \centering
@@ -1096,13 +1080,13 @@ Unlike iXBRL cells which are tagged, the JSON structure resulting from the OCR p
       \label{gridsearchxgboost}
   \end{table}
 
-  MLP is the most complicated model compared to logistic regression and XGBoost. There are a lot of hyperparameters to configure, and understanding them requires a deep understanding of neural networks. Therefore, the team explored a couple of hyperparameters to see how they impact the model. The scikit-learn documentation \cite{Pedregosa_Scikit-learn_Machine_Learning_2011} provides an explanation for each hyperparameter. The hyperparameters \textit{learning\_rate\_init} and \textit{max\_iter} are similar to \textit{learning\_rate} and \textit{n\_estimators} in XGBoost, in the sense that they control the rate of learning and the number of steps allowed. Another hyperparameter configured in MLP is Alpha, the L2 regularization strength. It controls how the model should penalise large weights, helping reduce the chance of overfitting. The best configuration is \textit{alpha} at 0.00001, \textit{learning\_rate\_innit} at 0.0001, \textit{max\_iter} at 100, achieving an average precision of 0.010506, as shown in Table \ref{gridsearchmlp}
+  MLP is the most complicated model compared to logistic regression and XGBoost. There are a lot of hyperparameters to configure, and understanding them requires a deep understanding of neural networks. Therefore, the team explored a several hyperparameters to see how they impact the model. The scikit-learn documentation \cite{Pedregosa_Scikit-learn_Machine_Learning_2011} provides an explanation for each hyperparameter. The hyperparameters \textit{learning\_rate\_init} and \textit{max\_iter} are similar to \textit{learning\_rate} and \textit{n\_estimators} in XGBoost, in the sense that they control the rate of learning and the number of steps allowed. Another hyperparameter configured in MLP is Alpha, the L2 regularization strength. It controls how the model should penalise large weights, helping reduce the chance of overfitting. The best configuration is \textit{alpha} at 0.00001, \textit{learning\_rate\_init} at 0.0001, and \textit{max\_iter} at 100, achieving an average precision of 0.010506, as shown in Table \ref{gridsearchmlp}.
 
   \begin{table}[h]
       \centering
       \begin{tabular}{llll}
       \toprule
-          alpha & learning\_rate\_innit & max\_iter & Average Precision \\
+          alpha & learning\_rate\_init & max\_iter & Average Precision \\
       \midrule
           0.00001 & 0.0001 & 100 & 0.010506 \\
           0.00001 & 0.0001 & 300 & 0.010506 \\
@@ -1115,16 +1099,12 @@ Unlike iXBRL cells which are tagged, the JSON structure resulting from the OCR p
       \label{gridsearchmlp}
   \end{table}
 
-  The evaluation of these models are discussed in section \ref{chap:evaluation}
+  The evaluation of these models is discussed in Chapter \ref{chap:evaluation}.
 
 
-  % \subsection{Model Assessment (???)}
+% \subsection{Model Assessment (???)}
 % Explain only the methods used + code? --> real evaluation is in Chapter 4 
 % OR JUST DELETE THIS SUBSECTION AND SAY THAT EVALUATION WILL BE EXPLAINED IN CHAPTER 4?
-
-
-
-
 
   
 
@@ -1180,26 +1160,32 @@ Each columns are introduced sequentially as followed:
 % [DONE] - Fine-tuning impact (mention overfitting) (Chapter 3 SUM)
 % [DONE] - Mention scale_pos_weight in XGBoost (explain in Chapter 3 , SUM)
 % [DONE] - Explain main hyperparameters briefly (explain in Chapter 3, SUM)
-% - Explain Confusion Matrix --> TP, TN, FP, FN (do we need to present confusion matrix ?) (Chapter 4, SUM)
-% - Focus mainly on AP when fine-tuning rather than ROC-AUC, P@K --> explain why (Chapter 4, ?)
 % [DONE | Need Review ] - What is ROC-AUC, AP, Precision at K + How they are calculated (Chapter 4, ohm)
 % [DONE | Need Review ] - Why ROC-AUC fails to reflect model's performance even the models achieve high scores (Chapter 4, done)
 % [DONE | Need Review ] - Why APs are extremely low + Fail to represent model's Performace (Chapter 4, ohm)
 % [DONE | Need Review ] - Why Precision @ K (Chapter 4, Ohm)
 % [DONE] - Lift (Chapter 4)
-% - Why each model perform differently (Chapter 4)
+% [DONE] - Explain Confusion Matrix --> TP, TN, FP, FN (Chapter 4, SUM)
+% [DONE]- Focus mainly on AP when fine-tuning rather than ROC-AUC, P@K --> explain why (Chapter 4)
+% [DONE] - How each model performs (Chapter 4)
+
 % - Coefficient, Feature Importance / SHAP ---> Explain what each one indicates + how it should be interpreted(Chapter 4)
-% - Which model is chosen + why (Chapter 4)
-% - Mention Panel data (Very breifly)
 
 % - Add Our Expextation of each model + how they actually performs ????
-% -----------------------------------------------------------------------------
 
-% Should we mention: Future development/Challenge
+% [DONE | Need Review | is it enough? --> very short]- Which model is chosen + why (Chapter 4)
+
+
+% [Should we?]- Mention Panel data (?) (Very breifly)
+% [Should we?] Mention Future development/Challenge
 % Comment:
 % Further avenues for this may be 1,2, and 3 which are interesting but has yet to be implemented into our current project
 
+% -----------------------------------------------------------------------------
 
+
+
+\section{Model Evaluation}
 
 %==========================================================
 \subsection{Evaluation Metrics}
@@ -1208,19 +1194,53 @@ Each columns are introduced sequentially as followed:
 %----------------------------------------------------------
 \subsubsection{Confusion Matrix}
 %----------------------------------------------------------
-Confusion matrix is an important foundation of most evaluation metrics, and it is important to understand the concept of true positive, false positive, true negative, and false negative. 
+A confusion matrix is an important foundation of most evaluation metrics, and it is important to understand the concepts of true positive, false positive, true negative, and false negative. 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.3\linewidth]{Group_LaTEX_Report/figures/confusion matrix.drawio.png}
+    \includegraphics[width=0.2\linewidth]{Group_LaTEX_Report/figures/confusion matrix.drawio.png}
     \caption{Confusion Matrix}
     \label{fig:confusionmatrix}
 \end{figure}
 
-As shown in Figure \ref{fig:confusionmatrix}, TP (True Positive) is when the model predicts as positive and the actual class is postive, TN (True Negative) is when the model predicts as negative and the actual class is negative, FP (False Positive) is when the model predicts as positive but the actual class is negative, and FN (False Negative) is when the model predicts as negative but the actual class is positive. The main evaluation metrics derived from a confusion matrix are precision, recall, accuracy, F1 score, and ROC-AUC. Precision is 
+As shown in Figure \ref{fig:confusionmatrix}, TP (True Positive) is when the model predicts positive and the actual class is positive, TN (True Negative) is when the model predicts negative and the actual class is negative, FP (False Positive) is when the model predicts positive but the actual class is negative, and FN (False Negative) is when the model predicts negative but the actual class is positive. 
 
-Table \ref{}, \ref{}, and \ref{} show the confusion matrix of logistic regression, XGBoost, and MLP model, respectively.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+     & 0 & 1 \\
+    \hline
+     0 & 47892 & 23987 \\
+    \hline
+     1 & 71 & 170 \\
+    \hline
+    \end{tabular}
+    \hspace{1cm}
+    \begin{tabular}{|c|c|c|}
+    \hline
+     & 0 & 1 \\
+    \hline
+     0 & 45905 & 25974 \\
+    \hline
+     1 & 61 & 180 \\
+    \hline
+    \end{tabular}
+    \hspace{1cm}
+    \begin{tabular}{|c|c|c|}
+    \hline
+     & 0 & 1 \\
+    \hline
+     0 & 61965 & 9914 \\
+    \hline
+     1 & 142 & 99 \\
+    \hline
+    \end{tabular}
+    \caption{Confusion Matrix - Logistic Regression (left), XGBoost (middle), MLP (right)}
+    \label{tab:confusionmatrix}
+\end{table}
 
+Table \ref{tab:confusionmatrix} shows the confusion matrices for Logistic Regression, XGBoost, and MLP. XGBoost has the highest number of true positives at 180, followed by logistic regression at 170 and MLP at 99. It also has the highest number of false positives at 25,974. These TP, TN, FP, and FN values are used to calculate most evaluation metrics. The main metrics are precision, recall, accuracy, F1 score, and ROC-AUC. However, these metrics do not suit every case and could be misleading.
 
 %----------------------------------------------------------
 \subsubsection{Why Not ROC-AUC}
@@ -1228,7 +1248,7 @@ Table \ref{}, \ref{}, and \ref{} show the confusion matrix of logistic regressio
 
 ROC-AUC measures the probability that a randomly selected
 positive example receives a higher predicted score than a
-randomly selected negative example. Whilst this is a
+randomly selected negative example. While this is a
 theoretically sound and widely used metric, it is unsuitable
 as the primary evaluation metric for this project for the
 following reason.
@@ -1244,7 +1264,7 @@ conversion rate of 0.33\%, meaning approximately 241
 companies are expected to be genuine first-time Lloyds
 borrowers. Even a model that achieves a high AUC score may
 still distribute these 241 companies throughout the full
-ranking rather than concentrating them at the top --- making
+ranking rather than concentrating them at the top making
 the model commercially less useful for a relationship
 management team that can only contact a limited number of
 companies each month. This motivates Precision@$K$ as the
@@ -1272,21 +1292,18 @@ each month. Precision@$K$ addresses this directly by
 evaluating only the top $K$ companies ranked by the model.
 
 The overall positive rate in the test set serves as the
-baseline for comparison --- representing the fraction of
+baseline for comparison representing the fraction of
 genuine Lloyds customers that would be found by random
 outreach without using any model. Lift is then used to
 measure how much better the model performs relative to this
 baseline. For example, if the baseline conversion rate is
 0.33\% and the model achieves Precision@100 of 3.3\%, the
-lift is 10 --- meaning the top 100 companies selected by the
+lift is 10  meaning the top 100 companies selected by the
 model contain genuine Lloyds customers at a rate ten times
 higher than expected under random selection. This makes
 Precision@$K$ and Lift particularly useful for communicating
 the commercial value of the model to relationship managers
 and business stakeholders.
-
-
-
 
 
 %==========================================================
@@ -1296,7 +1313,7 @@ and business stakeholders.
 GridSearch requires a single scoring metric to evaluate
 every hyperparameter combination during cross-validation.
 The choice of this metric directly determines which
-hyperparameters are selected --- a model tuned to maximise
+hyperparameters are selected a model tuned to maximise
 ROC-AUC will learn different hyperparameters than one tuned
 to maximise Average Precision or Precision@$K$, even on
 identical data. Three candidate metrics were considered:
@@ -1306,29 +1323,11 @@ metric for reasons specific to this project's data
 characteristics and commercial requirements.
 
 %----------------------------------------------------------
-\subsubsection{Why Not ROC-AUC}
-%----------------------------------------------------------
 
-ROC-AUC treats all positive-negative pairs equally
-regardless of where in the ranking they appear.
-Selecting hyperparameters to maximise ROC-AUC therefore
-does not guarantee that more genuine Lloyds borrowers will
-be concentrated at the top of the ranked list --- the
-property that Precision@$K$ directly measures.
-Furthermore, Davis and Goadrich~\cite{davis2006} formally
-proved that algorithms optimising the area under the ROC
-curve are \emph{not} guaranteed to optimise the area under
-the precision-recall curve. These two metrics measure
-fundamentally different properties, and optimising one
-does not ensure improvement in the other.
-
-\paragraph{Why Average Precision Rather Than
+\paragraph{Why not
            Precision@$K$ Directly.}
 
-Average Precision was preferred over Precision@$K$
-as the GridSearch scoring metric for two reasons.
-
-First, Precision@$K$ evaluates model performance
+Precision@$K$ evaluates model performance
 at a single fixed list size $K$, while Average
 Precision integrates across all possible values of
 $K$. Since the lead list may be used
@@ -1342,21 +1341,6 @@ quality throughout the full precision-recall curve,
 generalising across the full range of commercially
 relevant list sizes.
 
-Second, this reasoning was confirmed empirically
-in this project. Three GridSearch runs were conducted
-using ROC-AUC, Precision@100, and Average Precision
-as scoring metrics respectively, with identical data,
-random seeds, and parameter grids. The
-Precision@100-tuned model produced the worst
-Precision@$K$ result at every tested value of $K$,
-including $K=100$ itself (1.0\% vs 4.0\% for the
-Average Precision-tuned model). The Average
-Precision-tuned model achieved the highest
-Precision@$K$ at $K=100$, $K=200$, $K=500$,
-and $K=1000$ simultaneously, confirming that
-optimising for a single threshold does not reliably
-produce the best performance at that threshold
-compared to optimising for the full curve.
 %----------------------------------------------------------
 \subsubsection{Why Average Precision}
 %----------------------------------------------------------
@@ -1384,9 +1368,9 @@ class.}
 Unlike ROC-AUC, which evaluates ranking quality
 symmetrically across both classes and is influenced by the
 large number of true negatives, Average Precision involves
-only precision and recall --- both computed entirely from
+only precision and recall both computed entirely from
 positive-class performance. In a dataset where 99.67\% of
-companies are not genuine first-time Lloyds borrowers, a
+companies are not genuine Lloyd's customer, a
 model can achieve a high ROC-AUC partly by correctly
 ranking the large majority of irrelevant companies, without
 necessarily placing genuine borrowers at the top of the
@@ -1409,11 +1393,121 @@ it produces continuous scores that vary gradually between
 hyperparameter combinations. Small genuine differences in
 model quality produce small consistent differences in
 Average Precision, allowing GridSearch to identify the
-better configuration reliably --- without the $\pm$0.01
+better configuration reliably without the $\pm$0.01
 noise that makes Precision@$K$ scoring unreliable at the
 0.33\% positive rate observed in this project.
 
-% The balance configuration of hyperparameters are crucial to train a proper model.
+
+%==========================================================
+\subsection{Model Comparison}
+%==========================================================
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lllllll}
+    \toprule
+        Model & ROC-AUC & AP & P@100 & P@200 & P@500 & P@1000 \\
+        \midrule
+         Logistic Regression & 0.753612 & 0.010038 & 0.03 & 0.03 & 0.03 & 0.019 \\
+         XGBoost & 0.757248 & 0.009873 & 0.02 & 0.025 & 0.016 & 0.018 \\
+         MLP & 0.762443 & 0.010987 & 0.05 & 0.030 & 0.016 & 0.017 \\
+         \bottomrule
+    \end{tabular}
+    \caption{Model Comparison}
+    \label{tab:modelcompare}
+\end{table}
+
+As shown in Table \ref{tab:modelcompare}, the performance between each model is not significantly different. Every model achieves a ROC-AUC close to 0.75 and an AP close to 0.01. In terms of precision at K, for K = 100, MLP has the highest score at 0.05, while for K = 500, logistic regression achieve the highest score at 0.03. 
+
+
+%==========================================================
+\subsection{Model Interpretation}
+%==========================================================
+\subsubsection{Coefficients}
+According to Section \ref{sec:logisticregression}, coefficients are estimated using maximum likelihood. These coefficients indicate how each feature influences the outcome. This transparency of the model is the main advantage of logistic regression. The top 5 and bottom 5 of our model's coefficients are shown in Table \ref{tab:coefficients}. The feature \textit{account\_type\_medium} has the strongest effect on the prediction being the positive class (Lloyds customer), followed by \textit{sector\_Q:Health/Social} and \textit{account\_type\_small}. On the other hand, the feature \textit{region\_Northern Ireland} has the strongest influence on the prediction being the negative class (not a Lloyds customer), followed by \textit{sector\_B:Mining} and \textit{account\_type\_micro-entity}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+    \toprule
+        Feature & Coefficient \\
+        \midrule
+        cat\_\_account\_type\_medium & 1.423336 \\
+        cat\_\_sector\_Q: Health/Social & 1.277122 \\
+        cat\_\_account\_type\_small & 0.782259 \\
+        cat\_\_region\_North East & 0.743250 \\
+        cat\_\_region\_unknown & 0.730390 \\
+        ... & ... \\
+        cat\_\_account\_type\_total-exemption-small & -1.026308 \\
+        cat\_\_sector\_J: Information/Comms & -1.101164 \\
+        cat\_\_account\_type\_micro-entity & -1.234151 \\
+        cat\_\_sector\_B: Mining & -2.212720 \\
+        cat\_\_region\_Northern Ireland & -2.653556 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Coefficients: Top 5 and Bottom 5}
+    \label{tab:coefficients}
+\end{table}
+
+\subsubsection{Feature Importance}
+Since XGBoost is a tree-based model, the feature importance in XGBoost is different from coefficients in logistic regression. According to the documentation \cite{noauthor_xgboost_nodate}, the feature importance depends on the importance type: gain, weight, cover, total gain, and total cover. The default type is gain, which is the average loss reduction that a feature makes across all splits where it is used. Thus, feature importance in XGBoost does not indicate how each feature influences the class prediction, but rather how each feature contributes to the loss reduction. It seems like \textit{.feature\_importances\_} normalises the gain values, so that the importance from all features sums up to 1. The feature importance of our XGBoost model is shown in Table \ref{tab:featureimportance}. The feature \textit{cat\_\_account\_type\_micro-entity} has the highest value at about 0.426, much higher than the second highest, \textit{cat\_\_sector\_L: Real Estate} at 0.048.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+    \toprule
+        Feature & Importance \\
+        \midrule
+        cat\_\_account\_type\_micro-entity & 0.425852 \\
+        cat\_\_sector\_L: Real Estate & 0.048498 \\
+        num\_\_yrs\_since\_nonlloyds\_chg & 0.034578 \\
+        cat\_\_sector\_J: Information/Comms & 0.032855 \\
+        cat\_\_sector\_Q: Health/Social & 0.029273 \\
+        cat\_\_sector\_M: Professional/Scientific	 & 0.021844 \\
+        cat\_\_sector\_I: Accommodation/Food & 0.020203 \\
+        cat\_\_sector\_R: Arts/Recreation & 0.019340 \\
+        cat\_\_sector\_G: Retail/Wholesale & 0.017627 \\
+        cat\_\_region\_North East & 0.017579 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Feature Importance: Top 10}
+    \label{tab:featureimportance}
+\end{table}
+
+
+\subsubsection{SHAP}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Group_LaTEX_Report/figures/SHAPoutput.png}
+    \caption{SHAP plot}
+    \label{fig:shapoutput}
+\end{figure}
+
+% MOVE SHAP FROM CHAPTER 2 to HERE ???
+
+Since feature importance only indicates how each feature contributes to the loss reduction, SHAP is used to get more detail on each feature's impact.
+As shown in Figure \ref{fig:shapoutput}, it is clear that \textit{account\_type\_micro-entity} companies are likely to push the prediction toward the negative class (not a Lloyds customer), while companies that are not \textit{account\_type\_micro-entity} are likely to push the prediction toward the positive class (Lloyds customer). Another obvious pattern is that high \textit{age\_years} values result in a negative SHAP value, while low \textit{age\_years} values result in a positive SHAP value. These patterns can be useful to understand what could drive a company to become a Lloyds customer. 
+
+It may be interpreted that relatively small companies might not need lending services from Lloyds Bank, or they may not be a target for Lloyds. Similarly, young companies might be a target Lloyds wants to focus on, or Lloyds' lending services may suit younger companies better. However, these are assumptions made purely from the patterns obtained from SHAP, and they might not precisely reflect the actual cause. Although additional information is needed to support the interpretation, the patterns open up possibilities for further exploration.
+
+
+% Explain how to interpret SHAP beeswarm plot --> values, color, etc? 
+
+
+
+%==========================================================
+\subsection{Model Selection}
+%==========================================================
+
+% Mention EU AI Act and UK GDPR ---> OK ???
+Since the overall performance between each model is extremely close, interpretability becomes the main focus. This is crucial in the banking and financial services domain, especially under the EU AI Act and UK GDPR (General Data Protection Regulation). 
+
+Considering both performance and interpretability, logistic regression is selected, as it provides transparency and achieves the highest scores on precision@200, precision@500, and precision@1000.
+
+
+
+
 
 
 \section{OCR Evaluation}
@@ -1422,9 +1516,9 @@ noise that makes Precision@$K$ scoring unreliable at the
 \label{sec:evaluation_table_extraction}
 Evaluating extracted tables adds a layer of complexity, as it requires measuring both the model's ability to reproduce the layout of the table as well as its content. Zhong et al. \cite{zhong_2020} introduced the Tree-Edit-Distance-based Similarity (TEDS) metric which attempts to accomplish this by representing a table as a tree of rows and cells.
 
-$$ TEDS(T_a,T_b)= \frac{EditDist(T_a,T_b)}{max(|T_a,T_b|)}$$
+$$ TEDS(T_a,T_b)= 1-\frac{EditDist(T_a,T_b)}{max(|T_a,T_b|)}$$
 
-Any insertions or deletion of a cell has a cost of 1. Futhermore, any alterations where cell substitution is necessary, such as the case where cells are placed in the wrong row or column incurs an additional cost of 1. For content differences, normalized Liechtenstein distance $(\in[0,1])$ \cite{levenshtein_1966} is used to calculate the difference between strings. The final TEDS score, calculated between 0 and 1 where 1 is the highest, is found by dividing the Edit-Distance between two tables by the highest number of nodes between the two tables. However, as the metric is based on the assumption that the entities compared are HTML-based tables, tables produced by our different models must be first standardized to match this format. This was chosen over other documented metrics, such as F1, as TEDS penalises structural aberrations more heavily, which is extremely important for densely packed tables like those found in financial accounts where mis-aligned rows and columns can heavily impact the feature extraction steps down stream.
+Any insertions or deletion of a cell has a cost of 1. Furthermore, any alterations where cell substitution is necessary, such as the case where cells are placed in the wrong row or column incurs an additional cost of 1. For content differences, normalized Liechtenstein distance $(\in[0,1])$ \cite{levenshtein_1966} is used to calculate the difference between strings. The final TEDS score, calculated between 0 and 1 where 1 is the highest, is found by dividing the Edit-Distance between two tables by the highest number of nodes between the two tables. However, as the metric is based on the assumption that the entities compared are HTML-based tables, tables produced by our different models must be first standardized to match this format. This was chosen over other documented metrics, such as F1, as TEDS penalises structural aberrations more heavily, which is extremely important for densely packed tables like those found in financial accounts where mis-aligned rows and columns can heavily impact the feature extraction steps down stream.
 
 % explain about the different models used
 \subsubsection{Other Considered Approaches}
@@ -1463,7 +1557,16 @@ As previously stated, the TEDS metric assumes that both the ground truth and com
     \label{tab:placeholder}
 \end{table}
 
-Using the evaluation sample set created, Figure \ref{fig:teds_dist_for_all_models} shows a summary of the TEDS scores achieved when comparing model outputs to our ground truth. Even comparing against the untrained version of Qwen, the Table Transformer and Tesseract approach heavily under preform, completely missing tables in 19 of the page tested. This stems from both the model's modular design and previously mentioned issues with TATR's detection of sparsely populated tables. As a two step approach, Tesseract only interacts with what TATR is able to extract, meaning faults in table extraction cascades to Tesseract with no current method for course correction. Furthermore, TATR's rate of error is unexpectedly high, with 5 of the 12
+Using the evaluation sample set created, Figure \ref{fig:teds_dist_for_all_models} shows a summary of the TEDS scores achieved when comparing model outputs to our ground truth. Comparing against just the untrained version of Qwen3, the Table Transformer and Tesseract approach heavily under preform, completely missing tables in 19 of the page tested. This stems from both the model's modular design and previously mentioned issues with TATR's detection of sparsely populated tables. As a two step approach, Tesseract only interacts with what TATR is able to extract, meaning faults in table extraction cascades to Tesseract with no ability to course correct. Furthermore, TATR's rate of error is unexpectedly high, with 5 of the 12 of the table's bounding boxes being cropped too aggressively. Figure \ref{fig:example_of_TATR_error} shows an example of this, where certain parts of the tables are excluded from the output.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.30\linewidth]{Group_LaTEX_Report/figures/tesseract_error_example.png}
+    \caption{Example of TATR's Agressive Bounding Box}
+    \label{fig:example_of_TATR_error}
+\end{figure}
+
+
 
 \section{GDELT media index evaluation}
 \label{sec:eval-media}
@@ -1505,44 +1608,23 @@ The summary is that the media index was tested and did not worth a place in the 
 \chapter{Conclusion}
 \label{chap:conclusion}
 
-{\bf A compulsory chapter,  roughly 10\% of the total page-count}
-\vspace{1cm} 
-
 \noindent
-The concluding chapter(s) of a dissertation are often underutilized because they're 
-too often left too close to the deadline: it is important to allocate enough time and 
-attention to closing off the story, the narrative, of your thesis.
 
-Again, there is no single correct way of closing a thesis. 
-
-One good way of doing this is to have a single chapter consisting of three parts:
-
-\begin{enumerate}
-\item (Re)summarise the main contributions and achievements, in essence
-      summing up the content.
-\item Clearly state the current project status (e.g., ``X is working, Y 
-      is not'') and evaluate what has been achieved with respect to the 
-      initial aims and objectives (e.g., ``I completed aim X outlined 
-      previously, the evidence for this is within Chapter Y'').  There 
-      is no problem including aims which were not completed, but it is 
-      important to evaluate and/or justify why this is the case.
-\item Outline any open problems or future plans.  Rather than treat this
-      only as an exercise in what you {\em could} have done given more 
-      time, try to focus on any unexplored options or interesting outcomes
-      (e.g., ``my experiment for X gave counter-intuitive results, this 
-      could be because Y and would form an interesting area for further 
-      study'' or ``users found feature Z of my software difficult to use,
-      which is obvious in hindsight but not during at design stage; to 
-      resolve this, I could clearly apply the technique of Bloggs {\em et al.}.
-\end{enumerate}
-
-Alternatively, you might want to divide this content into two chapters: a penultimate chapter with a title such as ``Further Work" and then a final chapter ``Conclusions". Again, there is no hard and fast rule, we trust you to make the right decision. 
-
-And this, the final paragraph of this thesis template, is just a bunch of citations, added to show how to generate a BibTeX bibliography. Sources that have been randomly chosen to be cited here include:
-\cite{miller_etal_2018_clojure,webber_marwan_2015,touretzky_2013_lisp,eckmann_etal_1987,marwan_2011,vach_2015,shiller_2017,vytelingum_2006,tesfatsion_2002,rust_etal_1992}.
+The project mainly asked whether the combination of public 'structured' and 'unstructured' data can be used to predict business needs and inform commercial banking strategies. The answer to the question is a partial yes. Company general data and filings are able to rank the probability of UK SMEs to take a first Lloyds charge within a 5-year time frame with several times better than picking randomly. However, for the news coverage, the current depth of the open sources cannot significantly help answering the problem.
 
 
+\textbf{The data}. A Companies House pipeline collected a total of 839,295 UK companies, of which 567,835 are filtered as SMEs from the stated filter which contain 399,703 registered historical charges. The bulk product for company profiles is combined with the REST API for charges data, as the bulk does not contain any charge records. Therefore, the API is necessary with multiple API keys combined, designed to work simultaneously to maximise the workload and handle errors to efficiently pull the left out data from bulk. The label was then matched from 
+\textbf{persons\_entitled} field which is a free text, containing 33,822 distinct lender strings. It is matched with a regular expression for each of the Lloyds Banking Group entities. With a cutoff date of 1 January 2021 and a five-year window, the modelling table contains 360,600 prospects and 1,203 label as positives (converted), showing a rate of 0.33 percent.
 
+\textbf{The model}. The models used are Logistic regression, XGBoost and MLP. They are chosen not from the accuracy, but the difference in explainability of each model. Each was also tuned with five-fold cross-validation and grid search. The class imbalance problem was intendedly kept because forcing the dataset to be balance would be considered manipulating the model and therefore fail to represent the true population.
+
+\textbf{The metrics}. Accuracy is not in used for this particular project because a model answering 'no conversion' for every company would already have 99.76 percent accuracy rate -- severe class imbalance. Therefore, precision@K and lift over the base rate are mainly reported. Average precision is also utilised as the grid search metric. Three grid searches were run on the same seeds. The model that directly tuned for Precision@100 produced the worst Precision@K at every K. Therefore, optimising for one list size does not mean it would reliably produce the best result at that size.
+
+\textbf{The filings}. More than a quarter of accounts are filed with scanned documents, which means that they are not stored in a machine-readable way. A Qwen3-VL-8B model was fine-tuned with QLoRA to retrieve tables from them which reaches a mean TEDS of 0.904 against 0.438 for the Table Transformer and Tesseract approach. 
+
+\textbf{The media index}. The project has tested using news for each company and then abandoned, as SMEs news are rarely appeared with no reliable key to join an article to a company number. Therefore, instead of per news company, the project utilised a weekly index of 21 SIC industries by 12 UK regions, having each cell compared to its own 52-week trailing baseline. The index was pulled with BigQuery instead of REST API. 
+
+\textbf{What works and what does not}. The pipeline, the label and the ranking seem to work fine with the final model reaches Precision@100 at 3 percent against a base rate of 0.33 percent with a lift of nine times. The main model used is Logistic regression as the results from the three model are not separable, and therefore explainability is what decided. The media index however does not contribute to the model with its insignificant result. The index is therefore kept as a soft re-ordering with the weight of 0.15 on true cells only.
 
 % =============================================================================
 
