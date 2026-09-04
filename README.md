@@ -105,7 +105,17 @@ Verify the install — prints every path and whether it exists:
 python paths.py
 ```
 
-Every path should print `OK`. If one prints `MISS`, see below.
+Most paths print `OK`. **These seven print `MISS` in a clean clone and are expected:**
+
+| constant | why it is absent |
+|---|---|
+| `ENV_FILE` | you create `.env` yourself — see above |
+| `FILINGS_CSV` | Stage 6 is disabled and nothing reads it |
+| `ACCTYPE_CSV`, `SME_CSV` | legacy two-file layout, superseded by `companies.csv.gz` |
+| `FLAT_CSV`, `PANEL_CSV` | retired designs; the constants remain only so older notebook copies still resolve |
+| `LEADS_CSV` | an output — written when you run the pipeline |
+
+Anything *else* printing `MISS` is a real problem.
 
 ### The data ships with the repo
 

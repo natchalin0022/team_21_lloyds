@@ -10,7 +10,11 @@ python-dotenv>=1.1.0          # reads the Companies House API keys from .env
 tqdm>=4.67.1                  # progress bars on the long API pulls
 
 # --- modelling ---
-scikit-learn>=1.8.0           # LogisticRegression (primary), pipeline, grid search
+# PINNED, not >=: Model/model.joblib is a pickle written by 1.8.0. A newer sklearn
+# unpickles it with six InconsistentVersionWarnings warning that results "might be
+# invalid". Output was verified byte-identical under 1.9.0, but that is not guaranteed
+# to hold, and the manifest records sklearn_version so the mismatch is detectable.
+scikit-learn==1.8.0           # LogisticRegression (primary), pipeline, grid search
 joblib>=1.5.3                 # persists the fitted pipeline to Model/model.joblib
 xgboost>=3.4.1                # comparator in 4_model.ipynb
 shap>=0.52.0                  # feature attribution in 4_model.ipynb
