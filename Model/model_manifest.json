@@ -1,11 +1,11 @@
 {
   "model": "logreg",
-  "trained_at": "2026-09-03T19:57:25",
+  "trained_at": "2026-09-04T07:25:34",
   "trained_on_rows": 360600,
   "trained_on_positives": 1203,
   "prevalence": 0.003336,
-  "source_table": "/Users/natchalin_/Projects/final_project/Lloyds/API/flat_pot.csv",
-  "source_sha256": "9c1daa03ba2e745b",
+  "source_table": "/Users/natchalin_/Projects/final_project/Lloyds/API/flat_pot.csv.gz",
+  "source_sha256": "bd16de727a678a92",
   "feature_cols": [
     "sector",
     "region",

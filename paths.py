@@ -70,14 +70,17 @@ CHARGE_JSON_DIR = CH_DIR / "company_info_json"          # per-company charge/fil
 # The single company table: one row per company ever pulled, `is_sme` flags the
 # modelling population. Non-SME rows are kept deliberately — they are the
 # "already checked, do not re-pull" cache that keeps Stage 1 resumable.
-COMPANIES_CSV = CH_DATA / "companies.csv"
+# Stored gzipped so it fits inside GitHub's 100 MB per-file limit (149 MB -> 27 MB).
+# pandas reads and writes .csv.gz transparently from the extension, so no notebook
+# code changes: read_csv, to_csv, usecols and dtype all behave identically.
+COMPANIES_CSV = CH_DATA / "companies.csv.gz"
 
 # Legacy two-file layout, archived 2026-08-14 — superseded by COMPANIES_CSV.
 # Nothing active reads these; the constants remain only so any old//notebook copy
 # still resolves instead of throwing. Both are reproducible from COMPANIES_CSV.
 ACCTYPE_CSV = CH_DATA / "Archive" / "company_with_acctype" / "com_names_with_acctype_test.csv"
 SME_CSV     = CH_DATA / "Archive" / "company_sme_with_acctype" / "com_names_sme_test.csv"
-CHARGES_CSV = CH_DATA / "charges_history.csv"           # label source (is_lloyds)
+CHARGES_CSV = CH_DATA / "charges_history.csv.gz"        # label source (is_lloyds); gzipped, see above
 FILINGS_CSV = CH_DATA / "filings_history.csv"           # Stage 6 output (may not exist yet)
 
 # Archived 2026-08-14: the original 13.5k-company snapshot. `11_7_26.csv` was the
@@ -100,8 +103,8 @@ FLAT_CSV  = API_DIR / "flat.csv"           # one row per company (look-alike, re
 
 # THE live training table: one row per company, FORWARD-looking label.
 # Written by 3_Flat_table.ipynb, read by 4_model.ipynb. This path is the one
-# whitelisted in .gitignore, so keep the file here.
-FLAT_POT_CSV = API_DIR / "flat_pot.csv"
+# whitelisted in .gitignore, so keep the file here (gzipped, as above).
+FLAT_POT_CSV = API_DIR / "flat_pot.csv.gz"
 LEADS_CSV = API_DIR / "leads_flat.csv"     # ranked RM lead list
 
 # --- client I/O (5_score.ipynb) --------------------------------------------
@@ -112,7 +115,9 @@ LEADS_CSV = API_DIR / "leads_flat.csv"     # ranked RM lead list
 CLIENT_DIR      = ROOT / "client"
 CLIENT_INPUT    = CLIENT_DIR / "input"
 CLIENT_OUTPUT   = CLIENT_DIR / "output"        # one dated subfolder per run
-CLIENT_TEMPLATE = CLIENT_INPUT / "client_companies_TEMPLATE.csv"
+# In Template/, NOT directly in client/input/: Stage 0 globs client/input/*.csv
+# non-recursively, so a template sitting there would be ingested as a real client list.
+CLIENT_TEMPLATE = CLIENT_INPUT / "Template" / "client_companies_TEMPLATE.csv"
 
 # --- the shipped model artifact (written by 4_model.ipynb) -----------------
 MODEL_FILE     = MODEL_DIR / "model.joblib"
