@@ -155,8 +155,9 @@ run from any working directory. Never hardcode a path; add a constant there inst
 
 `API/CompaniesHouse/company_info_json/` holds one raw JSON per company per endpoint
 (`<com_num>_charges.json`, `<com_num>_filings.json`). It is a **cache, not a deliverable**:
-everything in it can be re-fetched from the API. The **charge** JSONs ship with the repo
-because `Stage 4b` rebuilds `charges_history.csv` from them; the filing JSONs do not, because
+everything in it can be re-fetched from the API. Only a **fraction** of the charge JSONs ship
+(~11.7k of the ~105k firms that hold charges) — shipping them all would add ~350 MB to
+regenerate a table the repo already contains. The filing JSONs do not ship at all, because
 nothing reads them.
 
 Nothing downstream reads the cache directly. Notebooks 2–5 work entirely from the two derived
@@ -168,10 +169,15 @@ cache absent.** Only `1_CompaniesHouse.ipynb` opens the JSONs, and only to rebui
 | **Stage 4** (charges) | **repairs itself** — it selects work by `Path.exists()` alone, so it re-fetches exactly the missing files (~105k companies, ~4.4 h on four keys) |
 | **Stage 6** (filings) | **disabled by default** (`RUN_STAGE_6 = False`) and does not repair itself — its `todo` also requires `n_filings.isna()`, so a company whose count is already recorded can never be re-fetched. Blank `n_filings` in `companies.csv.gz` for those rows before re-enabling |
 
-Stages 4b and 6 rebuild `charges_history.csv` and `filings_history.csv` *from the cache* and
-make no API calls. Both **refuse to write** when the rebuild comes out more than 5% smaller than
-the file already on disk, rather than silently replacing the label source with an empty table.
-If you hit that error, restore the cache or run Stage 4 — do not delete the guard.
+**Stage 4b merges, it does not rebuild.** It makes no API calls. A firm *with* a JSON on disk
+is refreshed from it (the JSON is authoritative — Stage 3 has just written it); a firm *without*
+one keeps whatever `charges_history.csv.gz` already says. That is what makes a fresh clone work
+despite the partial cache, and it is also correct for a client bringing companies we do not
+hold: Stage 3 writes a JSON for every company it pulls, so new firms are always refreshed.
+
+Both Stage 4b and Stage 6 **refuse to write** if the result comes out more than 5% smaller than
+the file already on disk. With the merge this should never happen in normal use — if it fires,
+something is genuinely wrong. Investigate rather than deleting the guard.
 
 **Stage 6 is switched off.** Filing history is not used anywhere: the shipped model's 13
 features come from the Stage 1 profile call and `charges_history.csv` alone, and neither
