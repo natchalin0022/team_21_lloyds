@@ -38,7 +38,7 @@ company_raw/*.csv                bulk Companies House company lists
       │
       ▼
 3_Flat_table.ipynb               features at ASOF=2021-01-01 + forward label
-                                 →  API/flat_pot.csv
+                                 →  API/flat_pot.csv.gz
       │
       ▼
 4_model.ipynb                    LogReg (primary) · XGBoost · MLP (comparators)
@@ -105,6 +105,36 @@ Verify the install — prints every path and whether it exists:
 python paths.py
 ```
 
+Every path should print `OK`. If one prints `MISS`, see below.
+
+### The data ships with the repo
+
+**There is nothing to download.** Everything the pipeline needs to run is in the clone —
+clone it, `pip install -r requirements.txt`, and the notebooks work.
+
+The three tables are stored **gzipped** so they fit inside GitHub's 100 MB per-file limit.
+`paths.py` points at the `.gz`, and pandas reads and writes that format transparently from
+the extension, so no notebook code differs because of it.
+
+| file | in repo | uncompressed | needed by |
+|---|---|---|---|
+| `companies.csv.gz` | 27 MB | 149 MB | every stage, and `5_score` |
+| `charges_history.csv.gz` | 6 MB | 44 MB | the label and all charge features |
+| `flat_pot.csv.gz` | 9 MB | 46 MB | `4_model` — the training table |
+
+Also shipped: the GDELT Parquet caches, `Model/model.joblib` and its manifest, the client
+input template, and the per-company **charge** JSON cache that `Stage 4b` rebuilds from.
+
+Two things are deliberately **not** in the repo, and neither is needed:
+
+- **`filings_history.csv` and the filing JSON cache.** Nothing reads them — `Stage 6` is
+  disabled (see *The JSON cache* below). They were ~1.9 GB.
+- **`.env` and real client lists.** API keys and customer data must never reach a public
+  repository. Only the template ships.
+
+You only need Companies House API keys if you intend to *pull fresh data*. Scoring a list
+against the shipped tables needs no credentials at all.
+
 ### Paths
 
 **`paths.py` is the single source of truth for every file location.** No notebook contains a
@@ -114,18 +144,19 @@ run from any working directory. Never hardcode a path; add a constant there inst
 ### The JSON cache
 
 `API/CompaniesHouse/company_info_json/` holds one raw JSON per company per endpoint
-(`<com_num>_charges.json`, `<com_num>_filings.json`). It is a **cache, not a deliverable**,
-and it may be absent from a copy of this repo that was trimmed for hand-off — it is by far
-the largest thing in the tree.
+(`<com_num>_charges.json`, `<com_num>_filings.json`). It is a **cache, not a deliverable**:
+everything in it can be re-fetched from the API. The **charge** JSONs ship with the repo
+because `Stage 4b` rebuilds `charges_history.csv` from them; the filing JSONs do not, because
+nothing reads them.
 
-Nothing downstream reads it. Notebooks 2–5 work entirely from the two derived tables,
-`companies.csv` and `charges_history.csv`, so **a client can score a list with the cache
-missing.** Only `1_CompaniesHouse.ipynb` touches the JSONs, and only to rebuild those tables.
+Nothing downstream reads the cache directly. Notebooks 2–5 work entirely from the two derived
+tables, `companies.csv.gz` and `charges_history.csv.gz`, so **a list can be scored with the
+cache absent.** Only `1_CompaniesHouse.ipynb` opens the JSONs, and only to rebuild those tables.
 
 | | if the cache is deleted |
 |---|---|
 | **Stage 4** (charges) | **repairs itself** — it selects work by `Path.exists()` alone, so it re-fetches exactly the missing files (~105k companies, ~4.4 h on four keys) |
-| **Stage 6** (filings) | **disabled by default** (`RUN_STAGE_6 = False`) and does not repair itself — its `todo` also requires `n_filings.isna()`, so a company whose count is already recorded can never be re-fetched. Blank `n_filings` in `companies.csv` for those rows before re-enabling |
+| **Stage 6** (filings) | **disabled by default** (`RUN_STAGE_6 = False`) and does not repair itself — its `todo` also requires `n_filings.isna()`, so a company whose count is already recorded can never be re-fetched. Blank `n_filings` in `companies.csv.gz` for those rows before re-enabling |
 
 Stages 4b and 6 rebuild `charges_history.csv` and `filings_history.csv` *from the cache* and
 make no API calls. Both **refuse to write** when the rebuild comes out more than 5% smaller than
@@ -265,21 +296,22 @@ Stated plainly because they matter for interpreting results.
 paths.py                  every file location — import, never hardcode
 
 API/CompaniesHouse/company_data/
-    companies.csv         one row per company ever pulled (is_sme flags the population)
-    charges_history.csv   one row per charge — the label source
+    companies.csv.gz      one row per company ever pulled (is_sme flags the population)
+    charges_history.csv.gz  one row per charge — the label source
     filings_history.csv   Stage 6 output; unused — Stage 6 is disabled by default
     company_raw/          bulk company lists + ingested client lists
 API/CompaniesHouse/company_info_json/    per-company charge/filing JSON (~600k files)
                           a rebuildable cache, safe to omit — see "The JSON cache"
 API/GDELT/BigQuery Cache files/          Parquet caches — never re-query if present
-API/flat_pot.csv          the training table
+API/flat_pot.csv.gz       the training table
 Model/                    model.joblib + model_manifest.json
 client/input/             what the client sends (gitignored except the template)
 client/output/<date>/     what you hand back
 ```
 
-**`.env` and everything under `client/` are gitignored** — API keys and customer lists must
-never reach the repository or a code submission. Only the template ships.
+**`.env` and real client lists are gitignored** — API keys and customer data must never
+reach the repository or a code submission. Only the input template and the per-run
+`run_manifest.txt` files ship.
 
 **The BigQuery caches are the expensive artefact.** A fresh 104-week pull scans ~350 GB against
 a 1 TB/month free tier. `USE_CACHE = True` / `USE_CACHE_REGION = True` load them for 0 GB —
